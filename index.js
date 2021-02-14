@@ -42,10 +42,16 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
+  // Input validation:
   if (!body.name || !body.number) {
     return response.status(400).json({ 
-      error: 'Stuff missing' 
+      error: 'Name and/or number missing!' 
     })
+  }
+  if (persons.find(person => person.name === body.name)) {
+      return response.status(400).json({ 
+        error: 'name must be unique'
+      })
   }
 
   const person = {
@@ -63,4 +69,3 @@ const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
-

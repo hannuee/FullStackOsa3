@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const Item = require('./models/item')
 const app = express()
 app.use(express.json())
 morgan.token('postBodyData', (req, res) => req.method === 'POST' ? JSON.stringify(req.body) : '')
@@ -20,7 +22,9 @@ const randomId = () => Math.floor(Math.random() * 100000000000)
 
 
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+  Item.find({}).then(items => {
+    res.json(items)
+  })
 })
 
 app.get('/info', (req, res) => {
@@ -71,7 +75,7 @@ app.post('/api/persons', (request, response) => {
   response.json(person)
 })
   
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

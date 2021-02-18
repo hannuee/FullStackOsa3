@@ -10,6 +10,18 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :p
 app.use(cors())
 app.use(express.static('build'))
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
+
 
 let persons = [
     { id: 1, name: 'Arto Hellas', number: '040-123456' },
@@ -42,11 +54,12 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Item.findByIdAndRemove(request.params.id)
     .then(result => {
       response.status(204).end()
     })
+    .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
